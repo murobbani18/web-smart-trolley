@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Controllers;
+use App\Models\ProductModel;
 
 class Home extends BaseController
 {
     public function index()
     {
-        return view('index');
+        return redirect()->to('/dashboard');
+        // return view('dashboard/index');
     }
 
     public function dashboard()
@@ -16,7 +18,13 @@ class Home extends BaseController
         }
 
         // Lanjutkan dengan tampilan dashboard jika staff/admin
-        return view('dashboard');
+        return view('dashboard/index');
     }
-
+    
+    public function katalog()
+    {
+        $itemModel = new ProductModel();
+        $items = $itemModel->findAll();
+        return view('katalog/index', ['items' => $items]);
+    }
 }

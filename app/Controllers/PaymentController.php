@@ -1,74 +1,104 @@
 <?php
-
 namespace App\Controllers;
 
 use App\Models\PaymentModel;
-use App\Models\BarangModel;
-use CodeIgniter\Controller;
+use App\Models\PaymentItemModel;
 
-class PaymentController extends Controller
+class PaymentController extends BaseController
 {
-    protected $paymentModel;
-    protected $barangModel;
-
-    public function __construct()
-    {
-        $this->paymentModel = new PaymentModel();
-        $this->barangModel = new BarangModel();
-    }
-
     public function index()
     {
-        $payments = $this->paymentModel->findAll();
-        return view('payment/index', ['payments' => $payments]);
+        $userId = session()->get('user_id');
+        
+        // Inisialisasi model
+        $paymentModel = new PaymentModel();
+
+        // Ambil semua pembayaran berdasarkan user_id
+        $payments = $paymentModel->where('user_id', $userId)
+                                ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
+                                ->findAll();
+
+        // Kirim data ke view
+        return view('payment/history', ['payments' => $payments]);
     }
 
-    // Pengguna buat pembayaran
-    public function create($barang_id)
+    public function validationPage()
     {
-        $barang = $this->barangModel->find($barang_id);
-        return view('payment/create', ['barang' => $barang]);
-    }
-
-    public function store()
-    {
-        $barangId = $this->request->getPost('barang_id');
-        $jumlah = $this->request->getPost('jumlah');
-        $namaPembeli = $this->request->getPost('nama_pembeli');
+        $paymentModel = new PaymentModel();
+        $payments = $paymentModel->where('status', 'pending')->findAll();
     
-        $barang = $this->barangModel->find($barangId);
-        $totalHarga = $barang['harga'] * $jumlah;
+        return view('payment/payment-validation', ['payments' => $payments]);
+    }
     
-        $this->paymentModel->save([
-            'user_id' => null,
-            'barang_id' => $barangId,
-            'jumlah' => $jumlah,
-            'total_harga' => $totalHarga,
-            'nama_pembeli' => $namaPembeli,
-            'status' => 'pending'
+    public function detail($paymentId)
+    {
+        // Inisialisasi model
+        $paymentModel = new PaymentModel();
+        $paymentItemModel = new PaymentItemModel();
+
+        // Ambil data pembayaran berdasarkan ID
+        $payment = $paymentModel->find($paymentId);
+
+        if (!$payment) {
+            return redirect()->to('/payments')->with('error', 'Pembayaran tidak ditemukan.');
+        }
+
+        // Ambil detail item pembayaran
+        $paymentItems = $paymentItemModel
+            ->select('payment_items.*, items.name, items.price')
+            ->join('items', 'payment_items.item_id = items.id')
+            ->where('payment_items.payment_id', $paymentId)
+            ->findAll();
+
+        // Kirim data ke view
+        return view('payment/detail', [
+            'payment' => $payment,
+            'paymentItems' => $paymentItems
         ]);
-    
-        return redirect()->to('/payment')->with('success', 'Pembayaran berhasil dibuat, menunggu validasi staff');
     }
 
-    // Staff validasi pembayaran
-    public function validatePayment($id)
+    public function validatePayment($paymentId)
     {
-        $this->paymentModel->update($id, [
-            'status' => 'validated',
-            'validated_by' => session()->get('id')
-        ]);
+        // Ambil data pembayaran dari database berdasarkan ID pembayaran
+        $paymentModel = new PaymentModel();
+        $payment = $paymentModel->find($paymentId);
 
-        return redirect()->to('/payment')->with('success', 'Pembayaran berhasil divalidasi');
+        if (!$payment || $payment['status'] != 'pending') {
+            return redirect()->to('/payments/validation')->with('error', 'Pembayaran tidak ditemukan atau sudah divalidasi.');
+        }
+
+        // Proses validasi pembayaran
+        $isValid = $this->processValidation($payment);
+
+        // Perbarui status pembayaran
+        $newStatus = $isValid ? 'validated' : 'cancelled';
+        $paymentModel->update($paymentId, ['status' => $newStatus]);
+
+        return redirect()->to('/payments/validation')->with('success', 'Pembayaran telah divalidasi.');
     }
 
-    public function rejectPayment($id)
+    public function cancelPayment($paymentId)
     {
-        $this->paymentModel->update($id, [
-            'status' => 'rejected',
-            'validated_by' => session()->get('id')
-        ]);
+        // Proses pembatalan pembayaran
+        $paymentModel = new PaymentModel();
+        
+        $payment = $paymentModel->find($paymentId);
+        if (!$payment) {
+            return redirect()->to('/payments/validation')->with('error', 'Pembayaran tidak ditemukan.');
+        }
 
-        return redirect()->to('/payment')->with('success', 'Pembayaran ditolak');
+        // Perbarui status pembayaran menjadi 'canceled'
+        $paymentModel->update($paymentId, ['status' => 'cancelled']);
+        
+        // Redirect setelah pembatalan
+        return redirect()->to('/payments/validation')->with('success', 'Pembayaran berhasil dibatalkan.');
+    }
+    // Proses validasi pembayaran oleh staff
+    private function processValidation($payment)
+    {
+        // Cek apakah pembayaran valid atau tidak
+        // Misalnya: validasi berdasarkan transaksi pembayaran yang telah dilakukan
+        // Jika pembayaran valid, return true, jika tidak, return false
+        return true; // Misalnya valid
     }
 }

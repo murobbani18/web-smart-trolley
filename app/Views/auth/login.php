@@ -22,6 +22,11 @@
                                     <?php echo session()->getFlashdata('error'); ?>
                                 </div>
                             <?php endif; ?>
+                            <?php if (session()->getFlashdata('success')): ?>
+                                <div class="alert alert-success">
+                                    <?php echo session()->getFlashdata('success'); ?>
+                                </div>
+                            <?php endif; ?>
                             <form action="/loginPost" method="post">
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Username</label>
