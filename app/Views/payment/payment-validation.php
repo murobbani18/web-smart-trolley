@@ -19,15 +19,26 @@
             <tr>
               <td><?= esc($payment['id']) ?></td>
               <td>
-                <?php if ($payment['status'] == 'pending'): ?>
-                  <span class="badge bg-warning">Menunggu Validasi</span>
-                <?php elseif ($payment['status'] == 'validated'): ?>
-                  <span class="badge bg-success">Divalidasi</span>
-                <?php elseif ($payment['status'] == 'cancelled'): ?>
-                  <span class="badge bg-secondary">Dibatalkan</span>
-                <?php else: ?>
-                  <span class="badge bg-danger">Gagal</span>
-                <?php endif; ?>
+                <?php 
+                  // Menampilkan status pembayaran dengan badge dan warna sesuai Tabler
+                  switch ($payment['status']) {
+                      case 'pending':
+                          echo '<span class="badge bg-yellow text-yellow-fg">Menunggu Verifikasi</span>';
+                          break;
+                      case 'paid':
+                          echo '<span class="badge bg-blue text-blue-fg">Sudah Dibayar</span>';
+                          break;
+                      case 'validated':
+                          echo '<span class="badge bg-green text-green-fg">Terverifikasi</span>';
+                          break;
+                      case 'cancelled':
+                          echo '<span class="badge bg-red text-red-fg">Dibatalkan</span>';
+                          break;
+                      default:
+                          echo '<span class="badge bg-secondary text-secondary-fg">Status Tidak Dikenal</span>';
+                          break;
+                  }
+              ?>
               </td>
               <td>
                 <?php if ($payment['status'] == 'pending'): ?>
