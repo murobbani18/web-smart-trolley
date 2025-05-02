@@ -145,6 +145,58 @@ class RfidsController extends Controller
         return $this->response->setJSON($response);
     }
     
+    public function payments()
+    {
+        $userId = 2;
+        // $userId = $this->request->getVar('user_id');
+    
+        // Instance models
+        $trolleyModel = new \App\Models\TrolleyItemModel();
+        $paymentModel = new \App\Models\PaymentModel();
+        $itemModel    = new \App\Models\ProductModel();
+    
+        // Get items in the trolley
+        $trolleyItems = $trolleyModel
+            ->select('trolley_items.*, items.price')
+            ->join('items', 'trolley_items.item_id = items.id')
+            ->where('trolley_items.user_id', $userId)
+            ->findAll();
+    
+        if (empty($trolleyItems)) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'lcd'     => 'Trolley Kosong', 
+                'message' => 'Keranjang kosong.'
+            ]);
+        }
+    
+        // Calculate total price
+        $total = array_sum(array_column($trolleyItems, 'price'));
+    
+        // Insert payment record
+        $paymentId = $paymentModel->insert([
+            'user_id'      => $userId,
+            'total_amount' => $total
+        ]);
+    
+        // Update stock and remove items from trolley
+        foreach ($trolleyItems as $item) {
+            $itemModel->where('id', $item['item_id'])->decrement('stock', 1);
+        }
+        $trolleyModel->where('user_id', $userId)->delete();
+    
+        // Prepare LCD display text
+        $lcdText = "Bayar Sukses\nTotal: Rp" . number_format($total, 0, ',', '.');
+    
+        return $this->response->setJSON([
+            'status'     => 'success',
+            'message'    => 'Pembayaran berhasil.',
+            'payment_id' => $paymentId,
+            'total'      => $total,
+            'lcd'        => $lcdText
+        ]);
+    }
+
     private function respondError($message)
     {
         $response = [

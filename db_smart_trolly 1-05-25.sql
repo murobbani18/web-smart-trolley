@@ -47,7 +47,7 @@ CREATE TABLE `items` (
 
 INSERT INTO `items` (`id`, `name`, `price`, `stock`, `rfid_code`, `rack_code`, `position_detail`, `description`, `image`, `created_at`, `updated_at`) VALUES
 (2, 'Alexander the Great book\'s', 200000, 0, '549AF603', 'R-01', 'rak kedua', 'A catalog of books about Alexander the Great typically includes biographies, historical analyses, and explorations of the cultural impact of his life and conquests. These books delve into his military strategies, leadership, and the legacy he left behind, examining both his successes and failures. They also often explore the evolution of Alexander\'s image in literature, art, and popular culture.', '1745918317_df1b3b29a75f22081655.jpg', '2025-04-29 09:10:30', '2025-05-01 10:04:51'),
-(7, 'landscape poster', 400000, 5, '1826182', 'R-02', 'rak pertama', '', '1745919164_a1a35702b4b3009f1255.png', '2025-04-29 09:32:44', '2025-05-01 08:33:38');
+(7, 'landscape poster', 400000, 5, '1826182', 'R-02', 'rak pertama', '', '1746160630_7c8278ff7a96f0544594.jpg', '2025-04-29 09:32:44', '2025-05-01 08:33:38');
 
 -- --------------------------------------------------------
 
