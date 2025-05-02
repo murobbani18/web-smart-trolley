@@ -48,15 +48,14 @@ class TrolleyController extends BaseController
         $userId = session()->get('user_id');
         
         $trolleyModel = new TrolleyItemModel();
-        $itemModel = new ProductModel();
-
         // Join untuk ambil detail produk
         $cartItems = $trolleyModel
-            ->select('trolley_items.*, items.name, items.stock, items.price, items.image')
+            ->select('trolley_items.user_id, trolley_items.item_id, SUM(trolley_items.quantity) as quantity, items.name, items.stock, items.price, items.image')
             ->join('items', 'items.id = trolley_items.item_id')
             ->where('trolley_items.user_id', $userId)
+            ->groupBy('trolley_items.item_id') // Mengelompokkan berdasarkan item_id
             ->findAll();
-
+    
         return view('trolley/cart', ['cartItems' => $cartItems]);
     }
 

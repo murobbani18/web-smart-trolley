@@ -19,7 +19,7 @@
                 <th>Harga</th>
                 <th>Jumlah</th>
                 <th>Subtotal</th>
-                <th>Aksi</th>
+                <!-- <th>Aksi</th> -->
               </tr>
             </thead>
             <tbody>
@@ -37,20 +37,20 @@
                   <td>Rp <?= number_format($item['price'], 0, ',', '.') ?></td>
                   <td>
                     <!-- Form untuk mengubah jumlah -->
-                    <form action="/update-quantity" method="post" class="d-flex">
-                      <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
-                      <input type="number" name="quantity" value="<?= $item['quantity'] ?>" min="1" max="<?= $item['stock'] ?>" class="form-control form-control-sm" style="width: 80px;">
+                    <!-- <form action="/update-quantity" method="post" class="d-flex">
+                      <input type="hidden" name="item_id" value="</?= $item['item_id'] ?>">
+                      <input type="number" name="quantity" value="</?= $item['quantity'] ?>" min="1" max="</?= $item['stock'] ?>" class="form-control form-control-sm" style="width: 80px;">
                       <button class="btn btn-sm btn-warning ms-2" type="submit">Update Jumlah</button>
-                    </form>
+                    </form> -->
+                  <?= number_format($item['quantity'], 0, ',', '.') ?>
                   </td>
                   <td>Rp <?= number_format($subtotal, 0, ',', '.') ?></td>
-                  <td>
-                    <!-- Form untuk menghapus item dari keranjang -->
+                  <!-- <td>
                     <form action="/remove-from-cart" method="post" onsubmit="return confirm('Hapus item ini?')">
-                      <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
+                      <input type="hidden" name="item_id" value="</?= $item['item_id'] ?>">
                       <button class="btn btn-sm btn-danger" type="submit">Hapus</button>
                     </form>
-                  </td>
+                  </td> -->
                 </tr>
               <?php endforeach ?>
             </tbody>

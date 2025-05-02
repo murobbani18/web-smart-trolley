@@ -7,7 +7,7 @@ class TrolleyItemModel extends Model
 {
     protected $table = 'trolley_items';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['user_id', 'item_id', 'quantity'];
+    protected $allowedFields = ['user_id', 'item_id', 'quantity', 'rfid_code'];
     protected $useTimestamps = true;
 
     public function updateItemQuantity($itemId, $quantity)

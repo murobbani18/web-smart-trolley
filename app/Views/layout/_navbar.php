@@ -1,4 +1,8 @@
-<?php $currentUrl = str_replace('/index.php/', '', current_url(true)->getPath()); ?>
+<?php 
+// $currentUrl = str_replace('/index.php/', '', current_url(true)->getPath()); 
+$currentUrl = str_replace('/index.php/', '', current_url(true)->getPath());  // Menghapus '/index.php/' jika ada
+$currentUrl = explode('/', $currentUrl)[0];  // Mengambil bagian pertama setelah pemisahan berdasarkan '/'
+?>
 <header class="navbar navbar-expand-md d-print-none">
     <div class="container-xl">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -52,7 +56,11 @@
                 </li>
             <?php endif; ?>
             <li class="nav-item <?php echo ($currentUrl == 'payments') ? 'active' : ''; ?>">
+            <?php if (session()->get('role') == 'staff'): ?>
+                <a class="nav-link" href="/payments/validation">
+            <?php else: ?>
                 <a class="nav-link" href="/payments">
+            <?php endif; ?>
                     <span class="nav-link-icon">
                         <!-- SVG Icon for Payments -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

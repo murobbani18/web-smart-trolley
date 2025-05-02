@@ -83,77 +83,76 @@ class RfidsController extends Controller
         }
     }
 
-    // Fungsi untuk mencari produk berdasarkan RFID code dan menambahkannya ke trolley
     public function addProduct()
     {
-        // Ambil data RFID code yang dikirim oleh NodeMCU
         $rfid_code = $this->request->getVar('rfid_code');
-
-        // Cek apakah RFID code ada di database
+        $userId    = 2;
+    
         $rfid = $this->RfidsModel->where('rfid_code', $rfid_code)->first();
-
-        if ($rfid) {
-            // Produk ditemukan berdasarkan RFID code, cari produk berdasarkan item_id
-            $product = $this->productModel->where('id', $rfid['item_id'])->first();
-
-            if ($product) {
-                $dataTrolley = [
-                    'user_id'  => 2,
-                    'item_id'  => $product['id'],
-                    'quantity' => 1
-                ];
-
-                // Menyimpan data trolley
-                if ($this->trolleyModel->save($dataTrolley)) {
-                    // Jika berhasil menyimpan data ke tabel trolley, return success
-                    $response = [
-                        'status'  => 'success',
-                        'message' => 'Produk ditambahkan.',
-                        'data'    => [
-                            'name'  => $product['name'],  // Nama produk
-                            'price' => $product['price'], // Harga produk
-                        ],
-                    ];
-
-                    // Log response untuk debug
-                    log_message('error', 'Produk berhasil ditambahkan ke trolley: ' . json_encode($response));
-
-                    return $this->response->setJSON($response);
-                } else {
-                    // Jika gagal menyimpan data ke trolley
-                    $response = [
-                        'status'  => 'error',
-                        'message' => 'Gagal menambahkan produk ke trolley.',
-                    ];
-
-                    // Log response error
-                    log_message('error', 'Gagal menambahkan produk ke trolley: ' . json_encode($response));
-
-                    return $this->response->setJSON($response);
-                }
-            } else {
-                // Jika produk tidak ditemukan di database produk
-                $response = [
-                    'status'  => 'error',
-                    'message' => 'Produk tidak ditemukan di database produk.',
-                ];
-
-                // Log response error
-                log_message('error', 'Produk tidak ditemukan di database produk: ' . json_encode($response));
-
-                return $this->response->setJSON($response);
-            }
-        } else {
-            // Jika RFID code tidak ditemukan
-            $response = [
-                'status'  => 'error',
-                'message' => 'RFID code tidak ditemukan.',
-            ];
-
-            // Log response error
-            log_message('error', 'RFID code tidak ditemukan: ' . json_encode($response));
-
-            return $this->response->setJSON($response);
+        if (!$rfid) return $this->respondError('RFID code tidak ditemukan.');
+    
+        $product = $this->productModel->find($rfid['item_id']);
+        if (!$product) return $this->respondError('Produk tidak ditemukan di database produk.');
+    
+        $itemId = $product['id'];
+    
+        // Hapus jika RFID ini ada di trolley user lain
+        $this->trolleyModel
+            ->where('rfid_code', $rfid_code)
+            ->where('user_id !=', $userId)
+            ->delete();
+    
+        // Toggle: jika RFID ini sudah ada di trolley user ini, hapus
+        $existing = $this->trolleyModel
+            ->where('rfid_code', $rfid_code)
+            ->where('user_id', $userId)
+            ->first();
+    
+        if ($existing) {
+            $this->trolleyModel
+                ->where('rfid_code', $rfid_code)
+                ->where('user_id', $userId)
+                ->delete();
+    
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Produk dihapus dari trolley.'
+            ]);
         }
+    
+        // Simpan produk ke trolley
+        $dataTrolley = [
+            'user_id'   => $userId,
+            'item_id'   => $itemId,
+            'quantity'  => 1,
+            'rfid_code' => $rfid_code
+        ];
+    
+        if (!$this->trolleyModel->save($dataTrolley)) {
+            return $this->respondError('Gagal menambahkan produk ke trolley.');
+        }
+    
+        $response = [
+            'status'  => 'success',
+            'message' => 'Produk ditambahkan ke trolley.',
+            'data'    => [
+                'name'  => $product['name'],
+                'price' => $product['price']
+            ]
+        ];
+    
+        log_message('error', 'Produk berhasil ditambahkan ke trolley: ' . json_encode($response));
+        return $this->response->setJSON($response);
+    }
+    
+    private function respondError($message)
+    {
+        $response = [
+            'status'  => 'error',
+            'message' => $message
+        ];
+    
+        log_message('error', $message);
+        return $this->response->setJSON($response);
     }
 }

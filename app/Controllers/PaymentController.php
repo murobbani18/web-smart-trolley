@@ -45,9 +45,10 @@ class PaymentController extends BaseController
 
         // Ambil detail item pembayaran
         $paymentItems = $paymentItemModel
-            ->select('payment_items.*, items.name, items.price')
+            ->select('payment_items.payment_id, payment_items.item_id, SUM(payment_items.quantity) as quantity, payment_items.price_at_purchase, items.name, items.price')
             ->join('items', 'payment_items.item_id = items.id')
             ->where('payment_items.payment_id', $paymentId)
+            ->groupBy('payment_items.payment_id, payment_items.item_id')
             ->findAll();
 
         // Kirim data ke view

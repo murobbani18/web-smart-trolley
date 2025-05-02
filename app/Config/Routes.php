@@ -43,7 +43,6 @@ $routes->group('products', ['filter' => 'staffonly'], function($routes) {
     $routes->post('update/(:num)', 'ProductController::update/$1');
     $routes->post('delete/(:num)', 'ProductController::delete/$1');
 });
-$routes->get('/products/detail/(:segment)', 'ProductController::detail/$1');
+$routes->get('/catalog/detail/(:segment)', 'ProductController::detail/$1');
 
-$routes->post('/rfids/register', 'RfidsController::registerFromNodeMCU');
 $routes->post('/rfids/scanning', 'RfidsController::addProduct');

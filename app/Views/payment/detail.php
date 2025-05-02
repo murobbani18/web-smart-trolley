@@ -63,9 +63,12 @@
     <?php else: ?>
         <p class="alert alert-warning">Tidak ada item dalam pembayaran ini.</p>
     <?php endif; ?>
-
     <div class="mt-3">
-        <a href="/payments" class="btn btn-primary">Kembali ke Daftar Pembayaran</a>
+        <button class="btn btn-primary" onclick="window.history.back()">Kembali</button>
     </div>
+
+    <!-- <div class="mt-3">
+        <a href="/payments" class="btn btn-primary">Kembali ke Daftar Pembayaran</a>
+    </div> -->
 </div>
 <?= $this->endSection() ?>

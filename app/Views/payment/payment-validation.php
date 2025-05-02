@@ -44,6 +44,7 @@
                 <?php if ($payment['status'] == 'pending'): ?>
                   <a href="/payments/validate/<?= $payment['id'] ?>" class="btn btn-sm btn-success">Validasi</a>
                   <a href="/payments/cancel/<?= $payment['id'] ?>" class="btn btn-sm btn-danger">Batalkan</a>
+                  <a href="/payments/detail/<?= esc($payment['id']) ?>" class="btn btn-sm btn-info">Lihat Detail</a>
                 <?php elseif ($payment['status'] == 'validated'): ?>
                   <span class="badge bg-success">Pembayaran Sudah Divalidasi</span>
                 <?php elseif ($payment['status'] == 'cancelled'): ?>

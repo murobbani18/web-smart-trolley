@@ -29,12 +29,12 @@
 
             <!-- Actions: View Details and Add to Cart -->
             <div class="d-flex justify-content-between">
-              <a href="/products/detail/<?= $item['id'] ?>" class="btn btn-sm btn-primary">Lihat Detail</a>
-              <form action="/add-to-cart" method="post" class="d-flex align-items-center">
-                <input type="hidden" name="item_id" value="<?= $item['id'] ?>">
-                <input type="number" name="quantity" value="1" min="1" max="<?= $item['stock'] ?>" class="form-control form-control-sm me-2" style="width: 60px;">
+              <a href="/catalog/detail/<?= $item['id'] ?>" class="btn btn-sm btn-primary">Lihat Detail</a>
+              <!-- <form action="/add-to-cart" method="post" class="d-flex align-items-center">
+                <input type="hidden" name="item_id" value="</?= $item['id'] ?>">
+                <input type="number" name="quantity" value="1" min="1" max="</?= $item['stock'] ?>" class="form-control form-control-sm me-2" style="width: 60px;">
                 <button type="submit" class="btn btn-sm btn-success">Tambah</button>
-              </form>
+              </form> -->
             </div>
           </div>
         </div>
