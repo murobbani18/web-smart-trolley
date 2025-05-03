@@ -47,3 +47,4 @@ $routes->get('/catalog/detail/(:segment)', 'ProductController::detail/$1');
 
 $routes->post('/rfids/scanning', 'RfidsController::addProduct');
 $routes->post('/rfids/payments', 'RfidsController::payments');
+$routes->get('/trolley/getItems', 'TrolleyController::getItems');

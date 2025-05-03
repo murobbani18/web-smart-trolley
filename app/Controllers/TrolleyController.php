@@ -142,4 +142,10 @@ class TrolleyController extends BaseController
     
         return redirect()->to('/payments/detail/' . $paymentId)->with('success', 'Pembayaran berhasil!');
     }
+    public function getItems()
+    {
+        $model = new TrolleyItemModel();
+        $data = $model->findAll();
+        return $this->response->setJSON($data);
+    }
 }

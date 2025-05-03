@@ -77,4 +77,35 @@
   </div>
 <?php endif ?>
 
+<script>
+let lastData = null;
+
+function normalizeData(data) {
+    // Urutkan berdasarkan item_id dan stringify agar bisa dibandingkan
+    return JSON.stringify(
+        data.sort((a, b) => a.item_id - b.item_id)
+    );
+}
+
+function loadTrolleyItems() {
+    fetch('/trolley/getItems')
+        .then(response => response.json())
+        .then(data => {
+            const newData = normalizeData(data);
+
+            if (newData !== lastData) {
+                if (lastData !== null) {
+                    // Hanya reload jika ini bukan pemanggilan pertama
+                    location.reload();
+                }
+                lastData = newData;
+            }
+        })
+        .catch(error => console.error('Fetch error:', error));
+}
+
+window.onload = loadTrolleyItems;
+setInterval(loadTrolleyItems, 2000);
+</script>
+
 <?= $this->endSection() ?>
