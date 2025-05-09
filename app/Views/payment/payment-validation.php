@@ -86,11 +86,11 @@
         <div class="tab-pane" id="tabs-history">
           <!-- <h4>History Pembayaran</h4> -->
            
-          <?php if (count($paymentsHistory)===0): ?>
+          <?php if (count($paymentsHistory)===0 || true): ?>
           <div style="display:flex; flex-direction: column; justify-content: center; align-items: center; min-height: 400px; gap: 1rem">
             <div style="position:relative">
               <img src="/assets/img/empty-history.jpg" style="height:200px"/>
-              <span class="text-muted" style="position:absolute; bottom:0px; right:0; font-size:.8rem"><i>Image by <a href="https://www.freepik.com/free-vector/flat-worried-woman-have-list-credit-debts-overdue-bills-girl-reading-letter-from-collection-agency-about-financial-problems-loans-unpaid-tax-calculation-payment-expenses-concept_22654317.htm#fromView=search&page=1&position=23&uuid=5f51ae80-df41-4fb7-9c10-8b7e139ca8aa&query=empty+payment">Freepick</a></i></span>
+              <span class="text-muted" style="position:absolute; bottom:0px; right:0; font-size:.8rem"><i>Image by <a href="https://www.freepik.com/free-vector/hand-drawn-no-data-illustration_59563768.htm#fromView=search&page=1&position=19&uuid=0aafdd44-3f59-403c-b83e-3bed199e0edb&query=empty+history+flat">Freepick</a></i></span>
             </div>
             <h4 class="text-muted" style="font-weight:500; font-size:1.2rem"><i>Tidak ada history pembayaran.</i></h4>
           </div>
