@@ -26,8 +26,12 @@ class PaymentController extends BaseController
     {
         $paymentModel = new PaymentModel();
         $payments = $paymentModel->where('status', 'pending')->findAll();
+
+        $paymentModel2 = new PaymentModel(); // model baru untuk query berbeda
+        $paymentsHistory = $paymentModel2->whereIn('status', ['validated', 'cancelled'])->findAll();
+
     
-        return view('payment/payment-validation', ['payments' => $payments]);
+        return view('payment/payment-validation', ['payments' => $payments, 'paymentsHistory' => $paymentsHistory]);
     }
     
     public function detail($paymentId)
