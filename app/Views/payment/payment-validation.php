@@ -86,7 +86,7 @@
         <div class="tab-pane" id="tabs-history">
           <!-- <h4>History Pembayaran</h4> -->
            
-          <?php if (count($paymentsHistory)===0 || true): ?>
+          <?php if (count($paymentsHistory)===0): ?>
           <div style="display:flex; flex-direction: column; justify-content: center; align-items: center; min-height: 400px; gap: 1rem">
             <div style="position:relative">
               <img src="/assets/img/empty-history.jpg" style="height:200px"/>
