@@ -8,5 +8,5 @@ class RfidsModel extends Model
     protected $table = 'item_rfids';
     protected $primaryKey = 'id';
     protected $allowedFields = ['item_id', 'rfid_code'];
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
 }

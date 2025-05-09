@@ -92,6 +92,7 @@ $currentUrl = explode('/', $currentUrl)[0];  // Mengambil bagian pertama setelah
                 </a>
             </li>
 
+            <?php if (session()->get('role') != 'staff'): ?>
             <li class="nav-item <?php echo ($currentUrl == 'cart') ? 'active' : ''; ?>">
                 <a class="nav-link" href="/cart">
                     <span class="nav-link-icon">
@@ -109,6 +110,7 @@ $currentUrl = explode('/', $currentUrl)[0];  // Mengambil bagian pertama setelah
                     <span class="nav-link-title">Cart</span>
                 </a>
             </li>
+            <?php endif; ?>
         </ul>
         <div class="navbar-nav flex-row order-md-last ms-auto">
             <a href="/logout" class="btn btn-outline-danger d-flex align-items-center">

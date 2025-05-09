@@ -48,7 +48,7 @@ class PaymentController extends BaseController
             ->select('payment_items.payment_id, payment_items.item_id, SUM(payment_items.quantity) as quantity, payment_items.price_at_purchase, items.name, items.price')
             ->join('items', 'payment_items.item_id = items.id')
             ->where('payment_items.payment_id', $paymentId)
-            ->groupBy('payment_items.payment_id, payment_items.item_id')
+            ->groupBy('payment_items.payment_id, payment_items.item_id, payment_items.price_at_purchase, items.name, items.price')
             ->findAll();
 
         // Kirim data ke view

@@ -20,7 +20,16 @@
 
       <!-- RFID -->
       <h4 class="mt-3">RFID</h4>
-      <p><?= esc($product['rfid_code']) ?></p>
+      <?php 
+        $rfidString = '';
+        foreach($product['rfids'] as $rfid) {
+            $rfidString .= $rfid['rfid_code'] . ', ';
+        }
+
+        $rfidString = substr($rfidString, 0, -2);
+      ?>
+
+      <p><?= esc($rfidString) ?></p>
 
       <!-- Button Kembali -->
       <a href="/products" class="btn btn-secondary mt-3">Kembali ke Daftar Produk</a>

@@ -68,7 +68,7 @@
 </div>
 
 <?php if (!empty($cartItems)): ?>
-  <div class="text-end mt-4">
+  <div class="text-end mt-4" style="display: none">
     <form action="/checkout" method="post">
       <button type="submit" class="btn btn-success">
         <i class="bi bi-credit-card"></i> Bayar Sekarang

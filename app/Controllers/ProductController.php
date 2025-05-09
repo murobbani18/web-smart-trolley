@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\ProductModel;
+use App\Models\RfidsModel;
 
 class ProductController extends BaseController
 {
@@ -13,12 +14,18 @@ class ProductController extends BaseController
     public function __construct()
     {
         $this->productModel = new ProductModel();
+        $this->rfidModel = new RfidsModel();
     }
 
     // List semua produk
     public function index()
     {
         $data['products'] = $this->productModel->findAll();
+
+        foreach($data['products'] as &$product) {
+            $product['rfids'] = $this->rfidModel->where('item_id', $product['id'])->findAll();
+        }
+
         return view('products/index', $data);
     }
 
@@ -27,6 +34,8 @@ class ProductController extends BaseController
     {
         // Ambil data produk berdasarkan ID
         $product = $this->productModel->find($id);
+
+        $product['rfids'] = $this->rfidModel->where('item_id', $product['id'])->findAll();
 
         // Kirim data ke view
         return view('products/detail', [
@@ -43,6 +52,7 @@ class ProductController extends BaseController
     // Simpan produk baru
     public function store()
     {
+
         // Ambil file gambar dari form
         $imageFile = $this->request->getFile('image');
         $imageName = '';
@@ -66,18 +76,30 @@ class ProductController extends BaseController
             return redirect()->back()->with('error', 'Gambar produk tidak valid atau gagal diupload.');
         }
 
+
+        $parsedRfidCode = json_decode($this->request->getPost('rfid_code'), true);
+
         // Simpan data produk di database
-        $this->productModel->save([
+        $productId = $this->productModel->insert([
             'name'        => $this->request->getPost('name'),
             'price'       => $this->request->getPost('price'),
-            'stock'       => $this->request->getPost('stock'),
+            'stock'       => count($parsedRfidCode),
             'description' => $this->request->getPost('description'),
             'image'       => $imageName, // Simpan nama file gambar
             'position_detail' => $this->request->getPost('position_detail'),
             'rack_code' => $this->request->getPost('rack_code'),
             'rfid_code' => $this->request->getPost('rfid_code'),
         ]);
+        
+        foreach($parsedRfidCode as $rfid) {
+            $this->rfidModel->save([
+                'rfid_code' => $rfid["value"],
+                'item_id' => $productId // nilai nya masih 0
+            ]);
+        }
 
+        // echo ENVIRONMENT;
+        // exit();
         // Redirect ke halaman produk dengan pesan sukses
         return redirect()->to('/products')->with('success', 'Produk berhasil ditambahkan!');
     }
@@ -86,6 +108,9 @@ class ProductController extends BaseController
     public function edit($id)
     {
         $data['product'] = $this->productModel->find($id);
+
+        $data['product']['rfids'] = $this->rfidModel->where('item_id', $data['product']['id'])->findAll();
+
         return view('products/edit', $data);
     }
 
@@ -108,7 +133,38 @@ class ProductController extends BaseController
             $imageFile->move('uploads/', $imageName);
             $data['image'] = $imageName;
         }
-    
+
+
+        $parsedRfidCode = json_decode($this->request->getPost('rfid_code'), true);
+
+        $editParsedRFIDCODE = [];
+        foreach ($parsedRfidCode as $rfid) {
+            $editParsedRFIDCODE[] = $rfid["value"];
+        }
+
+        $rfids = $this->rfidModel->where('item_id', $id)->findAll();
+        $existsRFIDS = [];
+        foreach ($rfids as $rfid) {
+            $existsRFIDS[] = $rfid['rfid_code'];
+        }
+
+        // delete rfid item jika tidak ada pada request 
+        foreach ($existsRFIDS as $rfid) {
+            if (!in_array($rfid, $editParsedRFIDCODE)) {
+                $this->rfidModel->where('rfid_code', $rfid)->where('item_id', $id)->delete();
+            }
+        }
+
+        // insert ke rfid item jika pada request tersebut tidak terdaftar pada rfid exists
+        foreach ($editParsedRFIDCODE as $rfid) {
+            if (!in_array($rfid, $existsRFIDS)) {
+                $this->rfidModel->save([
+                    'rfid_code' => $rfid,
+                    'item_id' => $id // nilai nya masih 0
+                ]);
+            }
+        }
+
         $this->productModel->update($id, $data);
     
         return redirect()->to('/products')->with('success', 'Produk berhasil diperbarui!');
@@ -129,7 +185,10 @@ class ProductController extends BaseController
                 unlink($imagePath);
             }
         }
-    
+   
+        // Hapus rfid yang berelasi dengan produk ini
+        $this->rfidModel->where('item_id', $id)->delete();
+        
         // Hapus data produk dari database
         $this->productModel->delete($id);
     

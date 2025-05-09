@@ -59,10 +59,15 @@
                     <label class="form-label">Detail Posisi</label>
                     <input type="text" name="position_detail" class="form-control" value="<?= esc($product['position_detail']) ?>">
                 </div>
-                
+                <?php
+                    $rfidString = '';
+                    foreach($product['rfids'] as $rfid) {
+                        $rfidString .= $rfid['rfid_code'] . ',';
+                    }
+                ?>
                 <div class="mb-3">
                     <label class="form-label">RFID Code</label>
-                    <input type="text" name="rfid_code" class="form-control" value="<?= esc($product['rfid_code']) ?>">
+                    <input type="text" name="rfid_code" class="form-control" value="<?= esc($rfidString) ?>" autofocus>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -72,6 +77,13 @@
 </div>
 
 <script>
+
+    // The DOM element you wish to replace with Tagify
+    var input = document.querySelector('input[name=rfid_code]');
+
+    // initialize Tagify on the above input node reference
+    new Tagify(input)
+
     function previewImage(event) {
         const input = event.target;
         const reader = new FileReader();

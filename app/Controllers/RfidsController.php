@@ -83,9 +83,68 @@ class RfidsController extends Controller
         }
     }
 
+    public function checkout()
+    {
+        $userId = 2;
+        $trolleyModel = new \App\Models\TrolleyItemModel();
+        $paymentModel = new \App\Models\PaymentModel();
+        $paymentItemModel = new \App\Models\PaymentItemModel();
+        $itemModel = new \App\Models\ProductModel();
+    
+        $trolleyItems = $trolleyModel
+            ->select('trolley_items.*, items.stock, items.price')
+            ->join('items', 'trolley_items.item_id = items.id')
+            ->where('trolley_items.user_id', $userId)
+            ->findAll();
+    
+        if (empty($trolleyItems)) {
+            return redirect()->back()->with('error', 'Keranjang kosong.');
+        }
+    
+        $total = 0;
+        foreach ($trolleyItems as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+    
+        // Simpan ke tabel payments
+        $paymentId = $paymentModel->insert([
+            'user_id'      => $userId,
+            'total_amount' => $total
+        ]);
+    
+        // Simpan detail item ke tabel payment_items
+        foreach ($trolleyItems as $item) {
+            $paymentItemModel->insert([
+                'payment_id'       => $paymentId,
+                'item_id'          => $item['item_id'],
+                'quantity'         => $item['quantity'],
+                'price_at_purchase'=> $item['price']
+            ]);
+    
+            // Update stok di tabel items
+            $itemModel->where('id', $item['item_id'])->decrement('stock', (int) $item['quantity']);
+        }
+    
+        // Kosongkan keranjang
+        $trolleyModel->where('user_id', $userId)->delete();
+    }
+
     public function addProduct()
     {
+        $rfid_checkout = ['d12345', 'd54321'];
         $rfid_code = $this->request->getVar('rfid_code');
+        if (in_array($rfid_code, $rfid_checkout)) {
+            $this->checkout();
+
+            $response = [
+                'status'  => 'success',
+                'message' => 'Checkout berhasil',
+            ];
+        
+            return $this->response->setJSON($response);
+        } 
+
+        // tambahkan ke keranjang
         $userId    = 2;
     
         $rfid = $this->RfidsModel->where('rfid_code', $rfid_code)->first();
@@ -93,6 +152,9 @@ class RfidsController extends Controller
     
         $product = $this->productModel->find($rfid['item_id']);
         if (!$product) return $this->respondError('Produk tidak ditemukan di database produk.');
+
+        // $product = $this->productModel->find($rfid_code);
+        // if (!$product) return $this->respondError('Produk tidak ditemukan di database produk.');
     
         $itemId = $product['id'];
     

@@ -52,7 +52,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">RFID Code</label>
-                    <input type="text" name="rfid_code" class="form-control" placeholder="Kode RFID">
+                    <input type="text" name="rfid_code" class="form-control" placeholder="Kode RFID" autofocus>
                 </div>
 
                 <button type="submit" class="btn btn-success">Simpan</button>
@@ -61,6 +61,13 @@
     </div>
 </div>
 <script>
+
+    // The DOM element you wish to replace with Tagify
+    var input = document.querySelector('input[name=rfid_code]');
+
+    // initialize Tagify on the above input node reference
+    new Tagify(input)
+
     function previewImage(event) {
         const input = event.target;
         const reader = new FileReader();

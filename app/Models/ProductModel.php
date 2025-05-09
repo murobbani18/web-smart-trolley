@@ -9,6 +9,7 @@ class ProductModel extends Model
     protected $table = 'items'; // Nama tabel produk
     protected $primaryKey = 'id';
     protected $allowedFields = ['name', 'price', 'stock', 'rfid_code', 'rack_code', 'position_detail', 'description', 'image'];
+    protected $useTimestamps = false;
 
     // Mendapatkan total produk
     public function getTotalProducts()

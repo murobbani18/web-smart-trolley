@@ -42,7 +42,15 @@
                 <td>Rp <?= number_format($p['price'], 0, ',', '.') ?></td>
                 <td><?= esc($p['stock']) ?></td>
                 <td><?= esc($p['description']) ?></td>
-                <td><?= esc($p['rfid_code']) ?></td>
+                <td>
+                  <ul>
+                    <?php
+                    foreach($p['rfids'] as $rfid) {
+                      echo '<li>' . esc($rfid['rfid_code']) . '</li>';
+                    }
+                    ?>
+                  </ul>
+                </td>
                 <td><?= esc($p['rack_code']) ?> - <?= esc($p['position_detail']) ?></td>
                 <td class="d-flex gap-2">
                   <a href="/products/edit/<?= $p['id'] ?>" class="btn btn-sm btn-warning">
